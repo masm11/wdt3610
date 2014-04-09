@@ -1,0 +1,85 @@
+■これは
+
+  ハイテックシステム MicroPC EES-3610 の watchdog の
+  Linux kernel 2.6.x 用ドライバ
+です。
+
+チップの名前がわからないので、ドライバ名は適当に
+  wdt3610
+なんてしてます。
+
+
+■ディレクトリ構成
+
+ * kernel ドライバ
+ * util   ユーティリティ
+
+
+■動作環境
+
+私の環境は以下の通りです。
+
+ ハイテックシステム MicroPC EES-3610
+ Slackware 11.0
+ linux kernel 2.6.19
+
+
+■ドライバのインストール
+
+コンパイルは
+
+  cd kernel/
+  make
+
+でいけます。
+
+wdt3610.ko ができあがったら、
+  /lib/module/`uname -r`/misc/
+にでも cp で置いてください。
+
+
+■ユーティリティのインストール
+
+ユーザ空間用プログラムです。
+世の中、もっと高機能なものがありますので、そっちの方がいいなら、
+そっちを使ってください。私はシンプルなのが欲しかったので作りま
+した。
+
+コンパイルは
+
+  cd util/
+  make watchdog
+
+でいけます。
+できあがった watchdog は /sbin/ あたりに cp で置いてください。
+
+modprobe.conf に以下のように書きます。
+
+  install wdt3610 modprobe --ignore-install wdt3610 && /sbin/watchdog
+
+こうすると、
+
+  1. OS 起動
+  2. hotplug で wdt3610 が load される。
+  3. /sbin/watchdog が起動される。
+
+となります。
+
+
+■テスト
+
+以下のコマンドを実行してください。
+
+  modprobe wdt3610
+
+モジュールが読み込まれ、さらに /sbin/watchdog が起動するはずです。
+うまくいったら、自動リセットを試してみましょう。
+
+  pkill -9 watchdog
+
+/sbin/watchdog が強制的に落とされ、1分ほどでリセットされるはずです。
+
+
+■ 著作権
+  (C) Copyright 2006 by Yuuki Harano <masm@flowernet.gr.jp>
+  COPYING を参照。
